@@ -6,9 +6,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"superstellar/backend/events"
-	"superstellar/backend/monitor"
-	"superstellar/backend/utils"
+	"github.com/u2i/superstellar/backend/events"
+	"github.com/u2i/superstellar/backend/monitor"
+	"github.com/u2i/superstellar/backend/utils"
 
 	"github.com/gorilla/websocket"
 )

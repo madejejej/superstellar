@@ -2,9 +2,9 @@ package state
 
 import (
 	"math"
-	"superstellar/backend/constants"
-	"superstellar/backend/pb"
-	"superstellar/backend/types"
+	"github.com/u2i/superstellar/backend/constants"
+	"github.com/u2i/superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/types"
 )
 
 // Projectile struct holds players' shots data.

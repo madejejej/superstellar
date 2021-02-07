@@ -5,7 +5,7 @@ import (
 	"log"
 	"math"
 	"strconv"
-	"superstellar/backend/events"
+	"github.com/u2i/superstellar/backend/events"
 	"sync/atomic"
 	"time"
 )

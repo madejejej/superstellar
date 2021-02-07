@@ -1,6 +1,6 @@
 package events
 
-import "superstellar/backend/pb"
+import "github.com/u2i/superstellar/backend/pb"
 
 // UserInput struct describes client's spaceship input.
 type UserInput struct {

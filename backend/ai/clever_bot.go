@@ -3,8 +3,8 @@ package ai
 import (
 	"math"
 	"math/rand"
-	"superstellar/backend/state"
-	"superstellar/backend/types"
+	"github.com/u2i/superstellar/backend/state"
+	"github.com/u2i/superstellar/backend/types"
 )
 
 const (

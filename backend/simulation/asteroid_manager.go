@@ -3,10 +3,10 @@ package simulation
 import (
 	"math"
 	"math/rand"
-	"superstellar/backend/constants"
-	"superstellar/backend/state"
-	"superstellar/backend/types"
-	"superstellar/backend/utils"
+	"github.com/u2i/superstellar/backend/constants"
+	"github.com/u2i/superstellar/backend/state"
+	"github.com/u2i/superstellar/backend/types"
+	"github.com/u2i/superstellar/backend/utils"
 	"time"
 )
 

@@ -12,15 +12,15 @@ import (
 import (
 	_ "net/http/pprof"
 	"os"
-	"superstellar/backend/ai"
-	"superstellar/backend/communication"
-	"superstellar/backend/events"
-	"superstellar/backend/game"
-	"superstellar/backend/monitor"
-	"superstellar/backend/persistence"
-	"superstellar/backend/simulation"
-	"superstellar/backend/state"
-	"superstellar/backend/utils"
+	"github.com/u2i/superstellar/backend/ai"
+	"github.com/u2i/superstellar/backend/communication"
+	"github.com/u2i/superstellar/backend/events"
+	"github.com/u2i/superstellar/backend/game"
+	"github.com/u2i/superstellar/backend/monitor"
+	"github.com/u2i/superstellar/backend/persistence"
+	"github.com/u2i/superstellar/backend/simulation"
+	"github.com/u2i/superstellar/backend/state"
+	"github.com/u2i/superstellar/backend/utils"
 )
 
 func main() {

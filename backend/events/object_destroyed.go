@@ -1,7 +1,7 @@
 package events
 
 import (
-	"superstellar/backend/state"
+	"github.com/u2i/superstellar/backend/state"
 	"time"
 )
 

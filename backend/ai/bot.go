@@ -1,6 +1,6 @@
 package ai
 
-import "superstellar/backend/state"
+import "github.com/u2i/superstellar/backend/state"
 
 type Bot interface {
 	HandleStateUpdate(space *state.Space, spaceship *state.Spaceship)

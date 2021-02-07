@@ -2,9 +2,9 @@ package leaderboard
 
 import (
 	"sort"
-	"superstellar/backend/constants"
-	"superstellar/backend/state"
-	. "superstellar/math"
+	"github.com/u2i/superstellar/backend/constants"
+	"github.com/u2i/superstellar/backend/state"
+	. "github.com/u2i/superstellar/math"
 )
 
 type FullLeaderboard struct {

@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
-	"superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/pb"
 	"time"
 
 	"github.com/golang/protobuf/proto"

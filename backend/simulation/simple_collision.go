@@ -2,8 +2,8 @@ package simulation
 
 import (
 	"math"
-	"superstellar/backend/state"
-	"superstellar/backend/types"
+	"github.com/u2i/superstellar/backend/state"
+	"github.com/u2i/superstellar/backend/types"
 )
 
 type SimpleCollision struct{}

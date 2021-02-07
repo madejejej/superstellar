@@ -1,10 +1,10 @@
 package communication
 
 import (
-	"superstellar/backend/events"
-	"superstellar/backend/pb"
-	"superstellar/backend/persistence"
-	"superstellar/backend/utils"
+	"github.com/u2i/superstellar/backend/events"
+	"github.com/u2i/superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/persistence"
+	"github.com/u2i/superstellar/backend/utils"
 )
 
 type ScoreBoardSender struct {
