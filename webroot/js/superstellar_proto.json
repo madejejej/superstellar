@@ -1,11 +1,13 @@
 {
     "package": "superstellar",
+    "syntax": "proto2",
     "options": {
-        "go_package": "pb"
+        "go_package": ".;pb"
     },
     "messages": [
         {
             "name": "Message",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -111,6 +113,7 @@
         },
         {
             "name": "Point",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -128,6 +131,7 @@
         },
         {
             "name": "Vector",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -145,6 +149,7 @@
         },
         {
             "name": "Spaceship",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -228,6 +233,7 @@
         },
         {
             "name": "Asteroid",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -263,6 +269,7 @@
         },
         {
             "name": "ProjectileFired",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -304,6 +311,7 @@
         },
         {
             "name": "ProjectileHit",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -315,6 +323,7 @@
         },
         {
             "name": "PlayerLeft",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -326,6 +335,7 @@
         },
         {
             "name": "PlayerJoined",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -343,6 +353,7 @@
         },
         {
             "name": "PlayerDied",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -360,6 +371,7 @@
         },
         {
             "name": "Ping",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -371,6 +383,7 @@
         },
         {
             "name": "Pong",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -382,6 +395,7 @@
         },
         {
             "name": "Space",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -405,6 +419,7 @@
         },
         {
             "name": "Hello",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -423,6 +438,7 @@
         },
         {
             "name": "Constants",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -512,6 +528,7 @@
         },
         {
             "name": "JoinGame",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -523,6 +540,7 @@
         },
         {
             "name": "JoinGameAck",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -540,6 +558,7 @@
         },
         {
             "name": "UserAction",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -551,6 +570,7 @@
         },
         {
             "name": "TargetAngle",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -562,6 +582,7 @@
         },
         {
             "name": "UserMessage",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -603,6 +624,7 @@
         },
         {
             "name": "Rank",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -620,6 +642,7 @@
         },
         {
             "name": "Leaderboard",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "repeated",
@@ -649,6 +672,7 @@
         },
         {
             "name": "ScoreBoardItem",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "optional",
@@ -666,6 +690,7 @@
         },
         {
             "name": "ScoreBoard",
+            "syntax": "proto3",
             "fields": [
                 {
                     "rule": "repeated",
@@ -679,6 +704,7 @@
     "enums": [
         {
             "name": "Direction",
+            "syntax": "proto3",
             "values": [
                 {
                     "name": "DIR_CENTER",
@@ -696,6 +722,7 @@
         },
         {
             "name": "UserInput",
+            "syntax": "proto3",
             "values": [
                 {
                     "name": "CENTER",
@@ -739,5 +766,6 @@
                 }
             ]
         }
-    ]
+    ],
+    "isNamespace": true
 }

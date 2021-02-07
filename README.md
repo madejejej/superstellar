@@ -13,6 +13,16 @@ Destroy moving objects and don’t get killed by other players and asteroids. Yo
 ## Story behind the game
 [https://medium.com/u2i-blogs/we-made-a-multiplayer-browser-game-in-go-for-fun-242a5990ce29/](https://medium.com/u2i-blogs/we-made-a-multiplayer-browser-game-in-go-for-fun-242a5990ce29/)
 
+## Installation of protobufs
+
+### Ubuntu
+
+```bash
+apt-get install protobuf-compiler
+npm install protobufjs@5.0.1
+cargo install protobuf-codegen
+```
+
 ## Installation & running
 1. Clone this repository to your `$GOPATH/src` directory
 1. `cd` to that directory
