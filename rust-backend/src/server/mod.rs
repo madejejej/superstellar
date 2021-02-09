@@ -32,7 +32,7 @@ impl Server {
 
             tokio::spawn(async move {
                 let mut client = Client::new(socket).await;
-                client.run();
+                client.run().await;
             });
         }
     }

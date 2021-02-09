@@ -13,6 +13,7 @@ futures-channel = "0.3"
 log = "0.4.14"
 pin-project = "1.0"
 prost = "0.7" # protobufs
+prost-types = "0.7"
 tokio = { version = "1.0.0", default-features = false, features = ["io-util", "io-std", "macros", "rt-multi-thread", "time"] } # networking
 tokio-tungstenite = "0.13.0" # Websockets
 tracing = { version = "0.1.5", features = ["log-always"] } # tracing
