@@ -1,7 +1,9 @@
 use simplelog::*;
 
-mod server;
-mod superstellar;
+pub mod game;
+pub mod server;
+pub mod superstellar;
+pub mod types;
 
 #[tokio::main]
 async fn main() {
