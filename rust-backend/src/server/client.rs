@@ -1,50 +1,57 @@
 use uuid::Uuid;
 
-use futures_util::StreamExt;
-use tokio::io::{AsyncRead, AsyncWrite};
-use tokio::net::{TcpListener, TcpStream};
-use tokio_tungstenite::WebSocketStream;
-use tracing::{debug, error};
-use tokio_tungstenite::tungstenite::Message;
 use crate::superstellar;
 
-pub struct Client<S>
-where
-    S: AsyncRead + AsyncWrite + Unpin,
-{
-    id: Uuid,
-    stream: WebSocketStream<S>,
+use std::error::Error;
+use tokio::sync::mpsc::UnboundedSender;
+use tokio_stream::wrappers::UnboundedReceiverStream;
+use tokio_stream::StreamExt;
+use tracing::debug;
+use warp::ws::{Message, WebSocket};
+
+type ReceiverStream = UnboundedReceiverStream<Result<Message, warp::Error>>;
+type Sender = UnboundedSender<Result<Message, warp::Error>>;
+
+#[derive(Debug)]
+pub struct Client {
+    pub id: Uuid,
+    pub username: Option<String>,
+    sender: Sender,
+    receiver: ReceiverStream,
+    websocket: WebSocket,
 }
 
-impl<S> Client<S>
-where
-    S: AsyncRead + AsyncWrite + Unpin,
-{
-    pub async fn new(stream: S) -> Client<S>
-    where
-        S: AsyncRead + AsyncWrite + Unpin,
-    {
-        let stream = tokio_tungstenite::accept_async(stream).await;
-        let stream = stream.expect("Failed to handshake with connection");
+impl Client {
+    pub fn new(websocket: WebSocket, sender: Sender, receiver: ReceiverStream) -> Client {
         let id = Uuid::new_v4();
 
-        debug!("Websocket handshake done for client {}", id);
+        debug!("Initializing client {}", id);
 
-        Client { stream, id }
+        Client {
+            id,
+            username: None,
+            sender,
+            receiver,
+            websocket,
+        }
     }
 
-    pub async fn run(&mut self) -> () {
-        while let Some(message) = self.stream.next().await {
-            let message = message.expect("Cannot read message from client");
-            debug!("Message received from client {}", self.id);
+    pub async fn run(&mut self) {
+        debug!("Client {} running", self.id);
+        while let Some(message) = self.websocket.next().await {
+            let message = message.expect("Cant read message");
 
-            match message {
-                Message::Binary(vec) => {
-                    let pb_message: superstellar::Message = prost::Message::decode(&*vec).expect("Cannot decode protobuf message");
-                    debug!("Received {:?}", pb_message);
+            let user_message: superstellar::UserMessage =
+                prost::Message::decode(message.as_bytes()).expect("Cannot decode protobuf message");
+            debug!("Received {:?}", user_message);
+
+            match user_message.content {
+                Some(superstellar::user_message::Content::JoinGame(join_game)) => {
+                    debug!("Player asks to join {:?}", join_game.username);
+                    self.username = Some(join_game.username);
                 }
-                message => {
-                    error!("Unexpected message {:?}", message);
+                _ => {
+                    // TODO
                 }
             }
         }
