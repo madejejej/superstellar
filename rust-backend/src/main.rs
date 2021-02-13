@@ -1,6 +1,7 @@
 use crate::game::{Game, GameInputMessage, GameSender};
 use crate::server::client::Client;
 use simplelog::*;
+use std::sync::atomic::{AtomicU32, Ordering};
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use tracing::{debug, error};
@@ -11,6 +12,9 @@ pub mod game;
 pub mod server;
 pub mod superstellar;
 pub mod types;
+
+/// Our global unique user id counter.
+static NEXT_USER_ID: AtomicU32 = AtomicU32::new(1);
 
 #[tokio::main]
 async fn main() {
@@ -44,7 +48,8 @@ async fn main() {
 async fn user_connected(websocket: WebSocket, game_sender: GameSender) {
     let (game_output_sender, game_output_receiver) = mpsc::unbounded_channel();
     let game_output_receiver = UnboundedReceiverStream::new(game_output_receiver);
-    let mut client = Client::new(websocket, game_sender.clone(), game_output_receiver);
+    let id = NEXT_USER_ID.fetch_add(1, Ordering::Relaxed);
+    let mut client = Client::new(id, websocket, game_sender.clone(), game_output_receiver);
 
     game_sender
         .send(GameInputMessage::PlayerConnected {

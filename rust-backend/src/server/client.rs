@@ -1,5 +1,3 @@
-use uuid::Uuid;
-
 use crate::superstellar;
 
 use crate::game::{GameInputMessage, GameOutputReceiverStream, GameSender};
@@ -11,7 +9,7 @@ use tracing::debug;
 use warp::ws::WebSocket;
 
 pub struct Client {
-    pub id: Uuid,
+    pub id: u32,
     pub username: Option<String>,
     sender: GameSender,
     receiver: GameOutputReceiverStream,
@@ -20,12 +18,11 @@ pub struct Client {
 
 impl Client {
     pub fn new(
+        id: u32,
         websocket: WebSocket,
         sender: GameSender,
         receiver: GameOutputReceiverStream,
     ) -> Client {
-        let id = Uuid::new_v4();
-
         debug!("Initializing client {}", id);
 
         Client {
@@ -73,6 +70,8 @@ impl Client {
         let mut buf = vec![];
         message.encode(&mut buf)?;
         // TODO: we might batch some messages and periodically flush
-        Ok(self.websocket.send(warp::ws::Message::binary(buf)).await?)
+        self.websocket.send(warp::ws::Message::binary(buf)).await?;
+
+        Ok(())
     }
 }
