@@ -1,0 +1,1 @@
+impl crate::superstellar::Spaceship {}

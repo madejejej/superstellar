@@ -1,14 +1,12 @@
-mod constants;
-mod entities;
-
-use crate::superstellar;
-
 use std::collections::HashMap;
 use std::sync::Arc;
+
 use tokio::sync::mpsc::UnboundedSender;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use tokio_stream::StreamExt;
 use tracing::{debug, error, info};
+
+use crate::superstellar;
 
 // Sender and Receiver types coming into Game
 pub type GameInputReceiverStream = UnboundedReceiverStream<GameInputMessage>;
@@ -68,25 +66,38 @@ pub enum GameInputMessage {
 pub struct Game {
     players: HashMap<u32, Player>,
     receiver: GameInputReceiverStream,
+    space: superstellar::Space,
 }
 
 impl Game {
     pub fn new(receiver: GameInputReceiverStream) -> Game {
         let players = HashMap::new();
+        let space = superstellar::Space::new();
 
-        Game { players, receiver }
+        Game {
+            players,
+            receiver,
+            space,
+        }
     }
 
     pub async fn run(&mut self) {
         info!("Game loop running");
 
+        let mut update_timer = tokio::time::interval(superstellar::constants::UPDATE_SEND_INTERVAL);
+        let mut physics_timer =
+            tokio::time::interval(superstellar::constants::PHYSICS_FRAME_DURATION);
+
         loop {
             tokio::select! {
                 message = self.receiver.next() => {
-                    let message = message.expect("cant read message");
-                    debug!("Received message: {:?}", message);
-                    self.handle_message(message);
-
+                    message.map(|msg| self.handle_message(msg));
+                }
+                _ = update_timer.tick() => {
+                    self.send_updates();
+                }
+                _ = physics_timer.tick() => {
+                    self.space.update();
                 }
             };
         }
@@ -135,6 +146,17 @@ impl Game {
             content: Some(superstellar::message::Content::PlayerJoined(
                 superstellar::PlayerJoined { id, username },
             )),
+        });
+
+        for player in self.players.values_mut() {
+            player.send_message(message.clone());
+        }
+    }
+
+    fn send_updates(&mut self) {
+        let space = self.space.clone();
+        let message = Arc::new(superstellar::Message {
+            content: Some(superstellar::message::Content::Space(space)),
         });
 
         for player in self.players.values_mut() {
