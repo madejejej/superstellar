@@ -57,6 +57,9 @@ pub enum GameInputMessage {
         id: u32,
         sender: UnboundedSender<GameOutputMessage>,
     },
+    PlayerDisconnected {
+        id: u32,
+    },
     PlayerCommand {
         id: u32,
         message: superstellar::UserMessage,
@@ -109,6 +112,9 @@ impl Game {
                 let player = Player::new(id, sender);
                 self.players.insert(id, player);
             }
+            GameInputMessage::PlayerDisconnected { id } => {
+                self.remove_player(id);
+            }
             GameInputMessage::PlayerCommand { id, message } => {
                 match message.content {
                     Some(superstellar::user_message::Content::JoinGame(join_game)) => {
@@ -122,7 +128,7 @@ impl Game {
         }
     }
 
-    pub fn join(&mut self, id: u32, username: String) {
+    fn join(&mut self, id: u32, username: String) {
         debug!("Player {} joining with username {}", id, username);
 
         let mut player = self.players.get_mut(&id).unwrap();
@@ -141,24 +147,39 @@ impl Game {
         self.announce_player_joined(id, username);
     }
 
-    pub fn announce_player_joined(&mut self, id: u32, username: String) {
-        let message = Arc::new(superstellar::Message {
+    fn remove_player(&mut self, id: u32) {
+        self.players
+            .remove(&id)
+            .expect("Cannot remove player from map");
+        let message = GameOutputMessage::new(superstellar::Message {
+            content: Some(superstellar::message::Content::PlayerLeft(
+                superstellar::PlayerLeft { id },
+            )),
+        });
+
+        self.broadcast(message);
+    }
+
+    fn announce_player_joined(&mut self, id: u32, username: String) {
+        let message = GameOutputMessage::new(superstellar::Message {
             content: Some(superstellar::message::Content::PlayerJoined(
                 superstellar::PlayerJoined { id, username },
             )),
         });
 
-        for player in self.players.values_mut() {
-            player.send_message(message.clone());
-        }
+        self.broadcast(message);
     }
 
     fn send_updates(&mut self) {
         let space = self.space.clone();
-        let message = Arc::new(superstellar::Message {
+        let message = GameOutputMessage::new(superstellar::Message {
             content: Some(superstellar::message::Content::Space(space)),
         });
 
+        self.broadcast(message);
+    }
+
+    fn broadcast(&mut self, message: GameOutputMessage) {
         for player in self.players.values_mut() {
             player.send_message(message.clone());
         }

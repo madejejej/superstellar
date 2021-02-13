@@ -5,7 +5,7 @@ use anyhow::Result;
 use futures_util::SinkExt;
 use prost::Message;
 use tokio_stream::StreamExt;
-use tracing::debug;
+use tracing::{debug, error};
 use warp::ws::WebSocket;
 
 pub struct Client {
@@ -39,9 +39,21 @@ impl Client {
 
         loop {
             tokio::select! {
-                Some(message) = self.websocket.next() => {
-                    let message = message.expect("Cant read message");
-                    self.handle_websocket_message(message).await?;
+                maybe_message = self.websocket.next() => {
+                    match maybe_message {
+                        Some(message) => {
+                            match message {
+                                Ok(message) => self.handle_websocket_message(message).await?,
+                                Err(e) => {
+                                    error!("Client {} error when reading message: {}", self.id, e);
+                                    return self.disconnect_client().await;
+                                }
+                            }
+                        }
+                        None => {
+                            return self.disconnect_client().await;
+                        }
+                    }
                 }
                 message = self.receiver.next() => {
                     let message = message.expect("Cant read message");
@@ -65,12 +77,17 @@ impl Client {
     }
 
     async fn handle_game_message(&mut self, message: GameOutputMessage) -> Result<()> {
-        debug!("Sending message to client {}: {:?}", self.id, message);
-
         let mut buf = vec![];
         message.encode(&mut buf)?;
         // TODO: we might batch some messages and periodically flush
         self.websocket.send(warp::ws::Message::binary(buf)).await?;
+
+        Ok(())
+    }
+
+    async fn disconnect_client(&mut self) -> Result<()> {
+        self.sender
+            .send(GameInputMessage::PlayerDisconnected { id: self.id })?;
 
         Ok(())
     }
