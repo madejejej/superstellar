@@ -1,6 +1,5 @@
 use crate::superstellar;
 
-
 use std::collections::HashMap;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio_stream::wrappers::UnboundedReceiverStream;
@@ -9,13 +8,22 @@ use tracing::{debug, info};
 use uuid::Uuid;
 
 pub type GameInputReceiverStream = UnboundedReceiverStream<GameInputMessage>;
-pub type GameOutputSender = UnboundedSender<GameOutputMessage>;
-pub type GameOutputReceiverStream = UnboundedReceiverStream<GameOutputMessage>;
+pub type GameOutputSender = UnboundedSender<superstellar::Message>;
+pub type GameOutputReceiverStream = UnboundedReceiverStream<superstellar::Message>;
 pub type GameSender = UnboundedSender<GameInputMessage>;
 
+#[derive(Debug)]
+enum PlayerState {
+    Joining,
+    Playing,
+    Lost,
+}
+
+#[derive(Debug)]
 struct Player {
     pub id: Uuid,
     pub username: Option<String>,
+    state: PlayerState,
     sender: GameOutputSender,
 }
 
@@ -23,21 +31,22 @@ impl Player {
     pub fn new(id: Uuid, sender: GameOutputSender) -> Player {
         Player {
             id,
+            state: PlayerState::Joining,
             username: None,
             sender,
         }
     }
-}
 
-pub enum GameOutputMessage {
-    Todo,
+    pub fn send_message(&mut self, message: superstellar::Message) {
+        self.sender.send(message);
+    }
 }
 
 #[derive(Debug)]
 pub enum GameInputMessage {
     PlayerConnected {
         id: Uuid,
-        sender: UnboundedSender<GameOutputMessage>,
+        sender: UnboundedSender<superstellar::Message>,
     },
     PlayerCommand {
         id: Uuid,
@@ -96,6 +105,16 @@ impl Game {
 
         let mut player = self.players.get_mut(&id).unwrap();
 
-        player.username = Some(username);
+        player.username = Some(username.clone());
+
+        let message = superstellar::Message {
+            content: Some(superstellar::message::Content::PlayerJoined(
+                superstellar::PlayerJoined { id: 1, username },
+            )),
+        };
+
+        for (id, player) in &mut self.players {
+            player.send_message(message.clone());
+        }
     }
 }

@@ -3,6 +3,9 @@ use uuid::Uuid;
 use crate::superstellar;
 
 use crate::game::{GameInputMessage, GameOutputReceiverStream, GameSender};
+use anyhow::Result;
+use futures_util::SinkExt;
+use prost::Message;
 use tokio_stream::StreamExt;
 use tracing::debug;
 use warp::ws::WebSocket;
@@ -34,19 +37,42 @@ impl Client {
         }
     }
 
-    pub async fn run(&mut self) {
+    pub async fn run(&mut self) -> Result<()> {
         debug!("Client {} running", self.id);
-        while let Some(message) = self.websocket.next().await {
-            let message = message.expect("Cant read message");
 
-            let user_message: superstellar::UserMessage =
-                prost::Message::decode(message.as_bytes()).expect("Cannot decode protobuf message");
-            debug!("Received {:?}", user_message);
+        loop {
+            tokio::select! {
+                Some(message) = self.websocket.next() => {
+                    let message = message.expect("Cant read message");
+                    self.handle_websocket_message(message).await?;
+                }
+                message = self.receiver.next() => {
+                    let message = message.expect("Cant read message");
+                    self.handle_game_message(message).await?;
+                }
 
-            self.sender.send(GameInputMessage::PlayerCommand {
-                id: self.id,
-                message: user_message,
-            });
+            }
         }
+    }
+
+    async fn handle_websocket_message(&mut self, message: warp::ws::Message) -> Result<()> {
+        let user_message: superstellar::UserMessage = prost::Message::decode(message.as_bytes())?;
+        debug!("Received {:?}", user_message);
+
+        self.sender.send(GameInputMessage::PlayerCommand {
+            id: self.id,
+            message: user_message,
+        })?;
+
+        Ok(())
+    }
+
+    async fn handle_game_message(&mut self, message: superstellar::Message) -> Result<()> {
+        debug!("Sending message to client {}: {:?}", self.id, message);
+
+        let mut buf = vec![];
+        message.encode(&mut buf)?;
+        // TODO: we might batch some messages and periodically flush
+        Ok(self.websocket.send(warp::ws::Message::binary(buf)).await?)
     }
 }

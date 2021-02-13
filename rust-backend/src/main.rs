@@ -3,7 +3,7 @@ use crate::server::client::Client;
 use simplelog::*;
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
-use tracing::debug;
+use tracing::{debug, error};
 use warp::filters::ws::WebSocket;
 use warp::Filter;
 
@@ -46,12 +46,19 @@ async fn user_connected(websocket: WebSocket, game_sender: GameSender) {
     let game_output_receiver = UnboundedReceiverStream::new(game_output_receiver);
     let mut client = Client::new(websocket, game_sender.clone(), game_output_receiver);
 
-    game_sender.send(GameInputMessage::PlayerConnected {
-        id: client.id,
-        sender: game_output_sender,
-    });
+    game_sender
+        .send(GameInputMessage::PlayerConnected {
+            id: client.id,
+            sender: game_output_sender,
+        })
+        .expect("Can't send message to game");
 
     debug!("User {} connected", client.id);
 
-    client.run().await;
+    match client.run().await {
+        Ok(()) => {}
+        Err(inner) => {
+            error!("Client error: {:?}", inner);
+        }
+    };
 }
