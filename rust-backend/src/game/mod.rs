@@ -69,13 +69,13 @@ pub enum GameInputMessage {
 pub struct Game {
     players: HashMap<u32, Player>,
     receiver: GameInputReceiverStream,
-    space: superstellar::Space,
+    space: superstellar::entities::space::Space,
 }
 
 impl Game {
     pub fn new(receiver: GameInputReceiverStream) -> Game {
         let players = HashMap::new();
-        let space = superstellar::Space::new();
+        let space = superstellar::entities::space::Space::new();
 
         Game {
             players,
@@ -144,6 +144,7 @@ impl Game {
         };
 
         player.send_message(Arc::new(message));
+        self.space.add_spaceship(player.id);
         self.announce_player_joined(id, username);
     }
 
@@ -151,6 +152,8 @@ impl Game {
         self.players
             .remove(&id)
             .expect("Cannot remove player from map");
+
+        self.space.remove_spaceship(&id);
         let message = GameOutputMessage::new(superstellar::Message {
             content: Some(superstellar::message::Content::PlayerLeft(
                 superstellar::PlayerLeft { id },
@@ -171,7 +174,7 @@ impl Game {
     }
 
     fn send_updates(&mut self) {
-        let space = self.space.clone();
+        let space = self.space.to_proto();
         let message = GameOutputMessage::new(superstellar::Message {
             content: Some(superstellar::message::Content::Space(space)),
         });

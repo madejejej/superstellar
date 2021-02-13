@@ -1,2 +1,2 @@
-mod space;
-mod spaceship;
+pub mod space;
+pub mod spaceship;
