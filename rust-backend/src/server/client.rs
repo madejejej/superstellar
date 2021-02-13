@@ -1,6 +1,6 @@
 use crate::superstellar;
 
-use crate::game::{GameInputMessage, GameOutputReceiverStream, GameSender};
+use crate::game::{GameInputMessage, GameOutputMessage, GameOutputReceiverStream, GameSender};
 use anyhow::Result;
 use futures_util::SinkExt;
 use prost::Message;
@@ -64,7 +64,7 @@ impl Client {
         Ok(())
     }
 
-    async fn handle_game_message(&mut self, message: superstellar::Message) -> Result<()> {
+    async fn handle_game_message(&mut self, message: GameOutputMessage) -> Result<()> {
         debug!("Sending message to client {}: {:?}", self.id, message);
 
         let mut buf = vec![];

@@ -1,15 +1,25 @@
+mod constants;
+mod entities;
+
 use crate::superstellar;
 
 use std::collections::HashMap;
+use std::sync::Arc;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use tokio_stream::StreamExt;
 use tracing::{debug, error, info};
 
+// Sender and Receiver types coming into Game
 pub type GameInputReceiverStream = UnboundedReceiverStream<GameInputMessage>;
-pub type GameOutputSender = UnboundedSender<superstellar::Message>;
-pub type GameOutputReceiverStream = UnboundedReceiverStream<superstellar::Message>;
 pub type GameSender = UnboundedSender<GameInputMessage>;
+
+// Sender and Receiver types for Messages coming out of Game.
+// We use an Arc, because Game output needs to send data to every client.
+// It should more efficient to send a pointer rather than copying the whole structure.
+pub type GameOutputMessage = Arc<superstellar::Message>;
+pub type GameOutputSender = UnboundedSender<GameOutputMessage>;
+pub type GameOutputReceiverStream = UnboundedReceiverStream<GameOutputMessage>;
 
 #[derive(Debug)]
 enum PlayerState {
@@ -36,7 +46,7 @@ impl Player {
         }
     }
 
-    pub fn send_message(&mut self, message: superstellar::Message) {
+    pub fn send_message(&mut self, message: GameOutputMessage) {
         self.sender
             .send(message)
             .unwrap_or_else(|_| error!("Can't send message to player {:?}", self.id));
@@ -47,7 +57,7 @@ impl Player {
 pub enum GameInputMessage {
     PlayerConnected {
         id: u32,
-        sender: UnboundedSender<superstellar::Message>,
+        sender: UnboundedSender<GameOutputMessage>,
     },
     PlayerCommand {
         id: u32,
@@ -116,16 +126,16 @@ impl Game {
             )),
         };
 
-        player.send_message(message);
+        player.send_message(Arc::new(message));
         self.announce_player_joined(id, username);
     }
 
     pub fn announce_player_joined(&mut self, id: u32, username: String) {
-        let message = superstellar::Message {
+        let message = Arc::new(superstellar::Message {
             content: Some(superstellar::message::Content::PlayerJoined(
                 superstellar::PlayerJoined { id, username },
             )),
-        };
+        });
 
         for player in self.players.values_mut() {
             player.send_message(message.clone());
