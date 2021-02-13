@@ -120,6 +120,9 @@ impl Game {
                     Some(superstellar::user_message::Content::JoinGame(join_game)) => {
                         self.join(id, join_game.username);
                     }
+                    Some(superstellar::user_message::Content::UserAction(user_action)) => {
+                        self.handle_user_action(id, user_action)
+                    }
                     _ => {
                         // TODO
                     }
@@ -171,6 +174,18 @@ impl Game {
         });
 
         self.broadcast(message);
+    }
+
+    fn handle_user_action(&mut self, id: u32, user_action: superstellar::UserAction) {
+        match user_action.user_input {
+            x if x == superstellar::UserInput::ThrustOn as i32 => {
+                self.space.spaceship_thrust(&id);
+            }
+            x if x == superstellar::UserInput::ThrustOff as i32 => {
+                self.space.spaceship_no_thrust(&id);
+            }
+            _ => {}
+        }
     }
 
     fn send_updates(&mut self) {

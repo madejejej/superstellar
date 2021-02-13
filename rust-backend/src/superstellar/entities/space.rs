@@ -28,6 +28,18 @@ impl Space {
         self.spaceships.remove(id);
     }
 
+    pub fn spaceship_thrust(&mut self, id: &u32) {
+        self.spaceships
+            .get_mut(id)
+            .map(|spaceship| spaceship.input_thrust = true);
+    }
+
+    pub fn spaceship_no_thrust(&mut self, id: &u32) {
+        self.spaceships
+            .get_mut(id)
+            .map(|spaceship| spaceship.input_thrust = false);
+    }
+
     pub fn to_proto(&self) -> crate::superstellar::Space {
         crate::superstellar::Space {
             physics_frame_id: self.physics_frame_id,

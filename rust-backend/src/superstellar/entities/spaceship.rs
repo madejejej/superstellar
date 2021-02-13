@@ -1,3 +1,4 @@
+use crate::superstellar::constants;
 use crate::superstellar::{Direction, Point, Vector};
 
 impl crate::superstellar::Spaceship {
@@ -11,8 +12,8 @@ impl crate::superstellar::Spaceship {
             input_direction: Direction::DirCenter.into(),
             input_thrust: false,
             input_boost: false,
-            max_hp: 500,
-            hp: 500,
+            max_hp: constants::SPACESHIP_INITIAL_HP,
+            hp: constants::SPACESHIP_INITIAL_HP,
             max_energy: 100,
             energy: 100,
             auto_repair_delay: 10,
