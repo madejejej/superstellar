@@ -18,6 +18,10 @@ impl Space {
 
     pub fn update(&mut self) {
         self.physics_frame_id += 1;
+
+        for spaceship in self.spaceships.values_mut() {
+            spaceship.update();
+        }
     }
 
     pub fn add_spaceship(&mut self, id: u32) {
