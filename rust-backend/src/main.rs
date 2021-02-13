@@ -33,7 +33,7 @@ async fn main() {
         .and(warp::ws())
         .and(game_sender_filter)
         .map(|ws: warp::ws::Ws, game_sender: GameSender| {
-            ws.on_upgrade(move |websocket| user_connected(websocket, game_sender.clone()))
+            ws.on_upgrade(move |websocket| user_connected(websocket, game_sender))
         });
 
     tokio::spawn(async move {

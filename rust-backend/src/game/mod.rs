@@ -1,11 +1,10 @@
 use crate::superstellar;
 
-use anyhow::Result;
 use std::collections::HashMap;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use tokio_stream::StreamExt;
-use tracing::{debug, info};
+use tracing::{debug, error, info};
 
 pub type GameInputReceiverStream = UnboundedReceiverStream<GameInputMessage>;
 pub type GameOutputSender = UnboundedSender<superstellar::Message>;
@@ -37,9 +36,10 @@ impl Player {
         }
     }
 
-    pub fn send_message(&mut self, message: superstellar::Message) -> Result<()> {
-        self.sender.send(message)?;
-        Ok(())
+    pub fn send_message(&mut self, message: superstellar::Message) {
+        self.sender
+            .send(message)
+            .unwrap_or_else(|_| error!("Can't send message to player {:?}", self.id));
     }
 }
 
@@ -105,19 +105,30 @@ impl Game {
         debug!("Player {} joining with username {}", id, username);
 
         let mut player = self.players.get_mut(&id).unwrap();
-
         player.username = Some(username.clone());
 
+        let message = superstellar::Message {
+            content: Some(superstellar::message::Content::JoinGameAck(
+                superstellar::JoinGameAck {
+                    success: true,
+                    error: "".to_string(),
+                },
+            )),
+        };
+
+        player.send_message(message);
+        self.announce_player_joined(id, username);
+    }
+
+    pub fn announce_player_joined(&mut self, id: u32, username: String) {
         let message = superstellar::Message {
             content: Some(superstellar::message::Content::PlayerJoined(
                 superstellar::PlayerJoined { id, username },
             )),
         };
 
-        for (_id, player) in &mut self.players {
-            player
-                .send_message(message.clone())
-                .expect(format!("Can't send message to player {:?}", player).as_str());
+        for player in self.players.values_mut() {
+            player.send_message(message.clone());
         }
     }
 }
