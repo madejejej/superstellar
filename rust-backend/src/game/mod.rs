@@ -7,6 +7,7 @@ use tokio_stream::StreamExt;
 use tracing::{debug, error, info};
 
 use crate::superstellar;
+use crate::superstellar::constants::*;
 
 // Sender and Receiver types coming into Game
 pub type GameInputReceiverStream = UnboundedReceiverStream<GameInputMessage>;
@@ -111,6 +112,7 @@ impl Game {
             GameInputMessage::PlayerConnected { id, sender } => {
                 let player = Player::new(id, sender);
                 self.players.insert(id, player);
+                self.send_constants(&id);
             }
             GameInputMessage::PlayerDisconnected { id } => {
                 self.remove_player(id);
@@ -129,6 +131,34 @@ impl Game {
                 }
             }
         }
+    }
+
+    fn send_constants(&mut self, id: &u32) {
+        let player = self.players.get_mut(id).unwrap();
+
+        let message = GameOutputMessage::new(superstellar::Message {
+            content: Some(superstellar::message::Content::Constants(
+                superstellar::Constants {
+                    world_radius: WORLD_RADIUS,
+                    boundary_annulus_width: BOUNDARY_ANNULUS_WIDTH,
+                    spaceship_acceleration: SPACESHIP_ACCELERATION,
+                    friction_coefficient: FRICTION_COEFFICIENT,
+                    spaceship_nonlinear_angular_acceleration:
+                        SPACESHIP_NON_LINEAR_ANGULAR_ACCELERATION,
+                    spaceship_linear_angular_acceleration: SPACESHIP_LINEAR_ANGULAR_ACCELERATION,
+                    spaceship_max_angular_velocity: SPACESHIP_MAX_ANGULAR_VELOCITY,
+                    spaceship_angular_friction: SPACESHIP_ANGULAR_FRICTION,
+                    spaceship_max_speed: SPACESHIP_MAX_SPEED,
+                    spaceship_boost_factor: SPACESHIP_BOOST_FACTOR,
+                    auto_repair_interval: AUTO_REPAIR_INTERVAL,
+                    auto_repair_amount: AUTO_REPAIR_AMOUNT,
+                    auto_energy_recharge_amount: AUTO_ENERGY_RECHARGE_AMOUNT,
+                    boost_per_frame_energy_cost: BOOST_PER_FRAME_ENERGY_COST,
+                },
+            )),
+        });
+
+        player.send_message(message);
     }
 
     fn join(&mut self, id: u32, username: String) {

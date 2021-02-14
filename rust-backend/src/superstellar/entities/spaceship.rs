@@ -24,14 +24,12 @@ impl crate::superstellar::Spaceship {
         if self.input_thrust {
             let delta = Vector::new(self.facing.cos() as f32, -self.facing.sin() as f32)
                 * constants::SPACESHIP_ACCELERATION;
-            self.velocity
-                .as_mut()
-                .map(|mut velocity| *velocity += &delta);
+            self.velocity.as_mut().map(|velocity| *velocity += &delta);
         }
 
         self.position
             .as_mut()
             .zip(self.velocity.as_ref())
-            .map(|(mut position, velocity)| *position += velocity);
+            .map(|(position, velocity)| *position += velocity);
     }
 }
