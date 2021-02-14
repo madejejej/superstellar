@@ -1,4 +1,5 @@
-use crate::superstellar::{Asteroid, Spaceship};
+use crate::superstellar::entities::spaceship::Spaceship;
+use crate::superstellar::Asteroid;
 use std::collections::HashMap;
 
 pub struct Space {
@@ -35,19 +36,29 @@ impl Space {
     pub fn spaceship_thrust(&mut self, id: &u32) {
         self.spaceships
             .get_mut(id)
-            .map(|spaceship| spaceship.input_thrust = true);
+            .map(|spaceship| spaceship.input_thrust(true));
+    }
+
+    pub fn spaceship_turn(&mut self, id: &u32, turn: i32) {
+        self.spaceships
+            .get_mut(id)
+            .map(|spaceship| spaceship.turn(turn));
     }
 
     pub fn spaceship_no_thrust(&mut self, id: &u32) {
         self.spaceships
             .get_mut(id)
-            .map(|spaceship| spaceship.input_thrust = false);
+            .map(|spaceship| spaceship.input_thrust(false));
     }
 
     pub fn to_proto(&self) -> crate::superstellar::Space {
         crate::superstellar::Space {
             physics_frame_id: self.physics_frame_id,
-            spaceships: self.spaceships.values().cloned().collect(),
+            spaceships: self
+                .spaceships
+                .values()
+                .map(|spaceship| spaceship.to_proto())
+                .collect(),
             asteroids: self.asteroids.values().cloned().collect(),
         }
     }

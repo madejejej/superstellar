@@ -18,6 +18,9 @@ pub const BOUNDARY_ANNULUS_WIDTH: f32 = 40000.0;
 // energy cost of frame of boosting
 pub const BOOST_PER_FRAME_ENERGY_COST: u32 = 20;
 
+// delta used for checking f32 equality
+pub const DELTA: f32 = 0.0000001;
+
 // a timeout measured in frames after which the ship is marked dirty
 pub const DIRTY_FRAMES_TIMEOUT: u32 = 50;
 

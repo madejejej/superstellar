@@ -214,6 +214,15 @@ impl Game {
             x if x == superstellar::UserInput::ThrustOff as i32 => {
                 self.space.spaceship_no_thrust(&id);
             }
+            x if x == superstellar::UserInput::Left as i32 => {
+                self.space.spaceship_turn(&id, x);
+            }
+            x if x == superstellar::UserInput::Right as i32 => {
+                self.space.spaceship_turn(&id, x);
+            }
+            x if x == superstellar::UserInput::Center as i32 => {
+                self.space.spaceship_turn(&id, x);
+            }
             _ => {}
         }
     }
