@@ -112,6 +112,7 @@ impl Game {
             GameInputMessage::PlayerConnected { id, sender } => {
                 let player = Player::new(id, sender);
                 self.players.insert(id, player);
+                self.send_hello(&id);
                 self.send_constants(&id);
             }
             GameInputMessage::PlayerDisconnected { id } => {
@@ -131,6 +132,31 @@ impl Game {
                 }
             }
         }
+    }
+
+    fn send_hello(&mut self, id: &u32) {
+        let id_to_username = self
+            .players
+            .iter()
+            .fold(HashMap::new(), |mut hsh, (id, player)| {
+                player
+                    .username
+                    .as_ref()
+                    .map(|username| hsh.insert(*id, username.clone()));
+
+                hsh
+            });
+
+        let player = self.players.get_mut(id).unwrap();
+
+        let message = GameOutputMessage::new(superstellar::Message {
+            content: Some(superstellar::message::Content::Hello(superstellar::Hello {
+                my_id: *id,
+                id_to_username,
+            })),
+        });
+
+        player.send_message(message);
     }
 
     fn send_constants(&mut self, id: &u32) {
