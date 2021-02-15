@@ -110,10 +110,10 @@ impl Game {
     fn handle_message(&mut self, message: GameInputMessage) {
         match message {
             GameInputMessage::PlayerConnected { id, sender } => {
-                let player = Player::new(id, sender);
+                let mut player = Player::new(id, sender);
+                self.send_hello(&mut player);
+                self.send_constants(&mut player);
                 self.players.insert(id, player);
-                self.send_hello(&id);
-                self.send_constants(&id);
             }
             GameInputMessage::PlayerDisconnected { id } => {
                 self.remove_player(id);
@@ -134,7 +134,7 @@ impl Game {
         }
     }
 
-    fn send_hello(&mut self, id: &u32) {
+    fn send_hello(&mut self, player: &mut Player) {
         let id_to_username = self
             .players
             .iter()
@@ -147,11 +147,9 @@ impl Game {
                 hsh
             });
 
-        let player = self.players.get_mut(id).unwrap();
-
         let message = GameOutputMessage::new(superstellar::Message {
             content: Some(superstellar::message::Content::Hello(superstellar::Hello {
-                my_id: *id,
+                my_id: player.id,
                 id_to_username,
             })),
         });
@@ -159,9 +157,7 @@ impl Game {
         player.send_message(message);
     }
 
-    fn send_constants(&mut self, id: &u32) {
-        let player = self.players.get_mut(id).unwrap();
-
+    fn send_constants(&mut self, player: &mut Player) {
         let message = GameOutputMessage::new(superstellar::Message {
             content: Some(superstellar::message::Content::Constants(
                 superstellar::Constants {
