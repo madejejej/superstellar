@@ -3,9 +3,9 @@ package state
 import (
 	"math"
 	"math/rand"
-	"superstellar/backend/constants"
-	"superstellar/backend/pb"
-	"superstellar/backend/types"
+	"github.com/u2i/superstellar/backend/constants"
+	"github.com/u2i/superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/types"
 )
 
 // Space struct holds entire game state.

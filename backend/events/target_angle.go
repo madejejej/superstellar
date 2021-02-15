@@ -1,6 +1,6 @@
 package events
 
-import "superstellar/backend/pb"
+import "github.com/u2i/superstellar/backend/pb"
 
 // TargetAngle struct describes client's spaceship angle steering input.
 type TargetAngle struct {

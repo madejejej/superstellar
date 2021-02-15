@@ -1,8 +1,8 @@
 package state
 
 import (
-	"superstellar/backend/pb"
-	"superstellar/backend/types"
+	"github.com/u2i/superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/types"
 )
 
 type Object interface {

@@ -3,7 +3,7 @@ package persistence
 import (
 	"log"
 
-	"superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/pb"
 
 	"strconv"
 

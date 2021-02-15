@@ -1,7 +1,7 @@
 package leaderboard
 
 import (
-	"superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/pb"
 )
 
 type Rank struct {

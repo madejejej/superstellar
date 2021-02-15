@@ -3,7 +3,7 @@ package leaderboard
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"superstellar/backend/constants"
+	"github.com/u2i/superstellar/backend/constants"
 )
 
 var _ = Describe("FullLeaderboard", func() {

@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"math"
-	. "superstellar/backend/types"
+	. "github.com/u2i/superstellar/backend/types"
 )
 
 var _ = Describe("Vector", func() {

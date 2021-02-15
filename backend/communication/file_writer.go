@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 	"path"
-	"superstellar/backend/events"
-	"superstellar/backend/pb"
-	"superstellar/backend/state"
+	"github.com/u2i/superstellar/backend/events"
+	"github.com/u2i/superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/state"
 	"time"
 
 	"github.com/golang/protobuf/proto"

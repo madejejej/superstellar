@@ -1,8 +1,8 @@
 package state
 
 import (
-	"superstellar/backend/constants"
-	"superstellar/backend/types"
+	"github.com/u2i/superstellar/backend/constants"
+	"github.com/u2i/superstellar/backend/types"
 
 	"time"
 )

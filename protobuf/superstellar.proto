@@ -1,6 +1,6 @@
 syntax = "proto3";
 package superstellar;
-option go_package = "pb";
+option go_package = ".;pb";
 
 message Message {
   oneof content {

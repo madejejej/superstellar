@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 	"math"
-	"superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/pb"
 )
 
 // Point structs holds 2D vector with int coordinates.

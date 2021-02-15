@@ -1,8 +1,8 @@
 package game
 
 import (
-	"superstellar/backend/constants"
-	"superstellar/backend/events"
+	"github.com/u2i/superstellar/backend/constants"
+	"github.com/u2i/superstellar/backend/events"
 	"time"
 )
 

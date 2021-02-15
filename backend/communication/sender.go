@@ -1,12 +1,12 @@
 package communication
 
 import (
-	"superstellar/backend/constants"
-	"superstellar/backend/events"
-	"superstellar/backend/leaderboard"
-	"superstellar/backend/pb"
-	"superstellar/backend/state"
-	"superstellar/backend/utils"
+	"github.com/u2i/superstellar/backend/constants"
+	"github.com/u2i/superstellar/backend/events"
+	"github.com/u2i/superstellar/backend/leaderboard"
+	"github.com/u2i/superstellar/backend/pb"
+	"github.com/u2i/superstellar/backend/state"
+	"github.com/u2i/superstellar/backend/utils"
 )
 
 type Sender struct {

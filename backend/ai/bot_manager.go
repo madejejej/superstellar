@@ -2,9 +2,9 @@ package ai
 
 import (
 	"fmt"
-	"superstellar/backend/events"
-	"superstellar/backend/state"
-	"superstellar/backend/utils"
+	"github.com/u2i/superstellar/backend/events"
+	"github.com/u2i/superstellar/backend/state"
+	"github.com/u2i/superstellar/backend/utils"
 )
 
 type BotManager struct {
