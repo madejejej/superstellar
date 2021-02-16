@@ -9,6 +9,13 @@ impl Point {
     pub fn new(x: i32, y: i32) -> Point {
         Point { x, y }
     }
+
+    pub fn from_polar(angle: f32, radius: f32) -> Point {
+        Point {
+            x: (radius * angle.cos()) as i32,
+            y: (radius * angle.sin()) as i32,
+        }
+    }
 }
 
 impl Add<Point> for Point {
@@ -66,6 +73,13 @@ impl Vector {
 
     pub fn length(&self) -> f32 {
         (self.x * self.x + self.y * self.y).sqrt()
+    }
+
+    pub fn rotate(&self, angle: f32) -> Vector {
+        Vector {
+            x: angle.cos() * self.x - angle.sin() * self.y,
+            y: angle.sin() * self.x + angle.cos() * self.y,
+        }
     }
 }
 

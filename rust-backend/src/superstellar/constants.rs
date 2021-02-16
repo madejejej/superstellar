@@ -1,5 +1,14 @@
 use std::time::Duration;
 
+// How many Asteroids to spawn at most
+pub const ASTEROID_COUNT_LIMIT: usize = 20;
+
+// The radius in which the Asteroids are spawned
+pub const ASTEROID_SPAWN_RADIUS: f32 = WORLD_RADIUS as f32 * 2.0;
+
+// Initial velocity of an Asteroid
+pub const ASTEROID_VELOCITY: f32 = 100.0;
+
 // the amount of energy a spaceship will receive after AUTO_REPAIR_DELAY
 pub const AUTO_ENERGY_RECHARGE_AMOUNT: u32 = 3;
 

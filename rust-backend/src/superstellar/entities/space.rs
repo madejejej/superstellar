@@ -1,3 +1,4 @@
+use crate::superstellar::constants::ASTEROID_COUNT_LIMIT;
 use crate::superstellar::entities::spaceship::Spaceship;
 use crate::superstellar::Asteroid;
 use std::collections::HashMap;
@@ -22,6 +23,12 @@ impl Space {
 
         for spaceship in self.spaceships.values_mut() {
             spaceship.update();
+        }
+
+        self.spawn_asteroids();
+
+        for asteroid in self.asteroids.values_mut() {
+            asteroid.update();
         }
     }
 
@@ -60,6 +67,13 @@ impl Space {
                 .map(|spaceship| spaceship.to_proto())
                 .collect(),
             asteroids: self.asteroids.values().cloned().collect(),
+        }
+    }
+
+    fn spawn_asteroids(&mut self) {
+        if self.asteroids.len() < ASTEROID_COUNT_LIMIT {
+            let asteroid = Asteroid::spawn_random();
+            self.asteroids.insert(asteroid.id, asteroid);
         }
     }
 }
