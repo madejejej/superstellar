@@ -1,13 +1,17 @@
 use crate::superstellar::constants;
 use crate::superstellar::constants::{
-    FRICTION_COEFFICIENT, SPACESHIP_ANGULAR_FRICTION, SPACESHIP_LINEAR_ANGULAR_ACCELERATION,
-    SPACESHIP_MAX_ANGULAR_VELOCITY, SPACESHIP_NON_LINEAR_ANGULAR_ACCELERATION,
+    BOUNDARY_ANNULUS_WIDTH, FRICTION_COEFFICIENT, SPACESHIP_ACCELERATION,
+    SPACESHIP_ANGULAR_FRICTION, SPACESHIP_LINEAR_ANGULAR_ACCELERATION,
+    SPACESHIP_MAX_ANGULAR_VELOCITY, SPACESHIP_MAX_SPEED, SPACESHIP_NON_LINEAR_ANGULAR_ACCELERATION,
+    WORLD_RADIUS,
 };
 use crate::superstellar::{Direction, Point, Vector};
 use std::f64::consts::PI;
 
 pub struct Spaceship {
     angular_velocity_delta: f32,
+    position: Point,
+    velocity: Vector,
     pb_spaceship: crate::superstellar::Spaceship,
 }
 
@@ -15,6 +19,8 @@ impl Spaceship {
     pub fn new(id: u32) -> Spaceship {
         Spaceship {
             angular_velocity_delta: 0.0,
+            position: Point::new(0, 0),
+            velocity: Vector::new(0.0, 0.0),
             pb_spaceship: crate::superstellar::Spaceship {
                 id,
                 position: Some(Point::new(0, 0)),
@@ -37,27 +43,35 @@ impl Spaceship {
         let thrust = self.pb_spaceship.input_thrust;
         let facing = self.pb_spaceship.facing;
 
-        self.pb_spaceship.velocity.as_mut().map(|velocity| {
-            if thrust {
-                let delta = Vector::new(facing.cos() as f32, -facing.sin() as f32)
-                    * constants::SPACESHIP_ACCELERATION;
-                *velocity += &delta
-            } else {
-                if !velocity.zero() {
-                    *velocity *= 1.0 - FRICTION_COEFFICIENT;
+        if thrust {
+            let delta = Vector::new(facing.cos() as f32, -facing.sin() as f32)
+                * constants::SPACESHIP_ACCELERATION;
+            self.velocity += &delta;
+        } else {
+            if !self.velocity.zero() {
+                self.velocity *= 1.0 - FRICTION_COEFFICIENT;
 
-                    if velocity.length() < 1.0 {
-                        velocity.set_zero();
-                    }
+                if self.velocity.length() < 1.0 {
+                    self.velocity.set_zero();
                 }
             }
-        });
+        }
 
-        self.pb_spaceship
-            .position
-            .as_mut()
-            .zip(self.pb_spaceship.velocity.as_ref())
-            .map(|(position, velocity)| *position += velocity);
+        let position_vec = self.position.into_vector();
+
+        if position_vec.length() + self.velocity.length() > WORLD_RADIUS as f32 {
+            let outreach_length = position_vec.length() - WORLD_RADIUS as f32;
+            let gravity_accel =
+                -(outreach_length / BOUNDARY_ANNULUS_WIDTH) * SPACESHIP_ACCELERATION;
+            let delta_velocity = position_vec.normalize() * gravity_accel;
+            self.velocity += &delta_velocity;
+        }
+
+        if self.velocity.length() > SPACESHIP_MAX_SPEED as f32 {
+            self.velocity = self.velocity.normalize() * SPACESHIP_MAX_SPEED as f32;
+        }
+
+        self.position += &self.velocity;
 
         match self.pb_spaceship.input_direction {
             x if x == Direction::DirLeft as i32 => {
@@ -92,7 +106,11 @@ impl Spaceship {
     }
 
     pub fn to_proto(&self) -> crate::superstellar::Spaceship {
-        self.pb_spaceship.clone()
+        let mut cloned = self.pb_spaceship.clone();
+        cloned.velocity = Some(self.velocity.clone());
+        cloned.position = Some(self.position.clone());
+
+        cloned
     }
 
     fn angular_velocity_delta(&self) -> f32 {

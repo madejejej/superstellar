@@ -16,7 +16,17 @@ impl Point {
             y: (radius * angle.sin()) as i32,
         }
     }
+
+    pub fn into_vector(&self) -> Vector {
+        Vector {
+            x: self.x as f32,
+            y: self.y as f32,
+        }
+    }
 }
+
+impl Copy for Point {}
+impl Copy for Vector {}
 
 impl Add<Point> for Point {
     type Output = Self;
@@ -57,6 +67,15 @@ impl AddAssign<&Vector> for Point {
     }
 }
 
+impl AddAssign<&mut Vector> for Point {
+    fn add_assign(&mut self, other: &mut Vector) {
+        *self = Self {
+            x: self.x + other.x as i32,
+            y: self.y + other.y as i32,
+        };
+    }
+}
+
 impl Vector {
     pub fn new(x: f32, y: f32) -> Vector {
         Vector { x, y }
@@ -73,6 +92,15 @@ impl Vector {
 
     pub fn length(&self) -> f32 {
         (self.x * self.x + self.y * self.y).sqrt()
+    }
+
+    pub fn normalize(&self) -> Vector {
+        let norm = (self.x * self.x + self.y * self.y).sqrt();
+
+        Vector {
+            x: self.x / norm,
+            y: self.y / norm,
+        }
     }
 
     pub fn rotate(&self, angle: f32) -> Vector {
@@ -96,6 +124,15 @@ impl Add for Vector {
 
 impl AddAssign<&Vector> for Vector {
     fn add_assign(&mut self, other: &Vector) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        };
+    }
+}
+
+impl AddAssign<&mut Vector> for Vector {
+    fn add_assign(&mut self, other: &mut Vector) {
         *self = Self {
             x: self.x + other.x,
             y: self.y + other.y,
